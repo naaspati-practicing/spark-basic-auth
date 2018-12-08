@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+repositories {
+    jcenter()
+}
+
+mainClassName = 'Main'
+
+
+ext.SPARK_VERSION = '2.7.2'
+
+dependencies {
+  compile 'com.sparkjava:spark-core:'+SPARK_VERSION
+  compile 'org.slf4j:slf4j-jdk14:1.7.25'
+
+}
+
+
+run {
+    standardInput = System.in
+    systemProperties['java.util.logging.config.file'] = 'logging.properties'
+}
