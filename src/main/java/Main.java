@@ -7,11 +7,8 @@ import static spark.Spark.port;
 import static spark.Spark.staticFiles;
 import static spark.Spark.stop;
 
-import java.util.Optional;
 import java.util.Scanner;
 
-import sam.logging.ANSI;
-import spark.Session;
 import spark.embeddedserver.EmbeddedServers;
 import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 
