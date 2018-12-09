@@ -1,5 +1,5 @@
 
-import static spark.Spark.awaitInitialization;
+import static spark.Spark.*;
 import static spark.Spark.before;
 import static spark.Spark.get;
 import static spark.Spark.path;
@@ -9,11 +9,12 @@ import static spark.Spark.stop;
 
 import java.util.Scanner;
 
+import org.eclipse.jetty.security.authentication.FormAuthenticator;
+
 import sam.logging.filter.ANSI;
 import sam.spark.authentication.MyServerFactory;
 import spark.Session;
 import spark.embeddedserver.EmbeddedServers;
-import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 
 public class Main {
 
@@ -32,15 +33,6 @@ public class Main {
 		path("hello", () -> {
 			get("", (req, res) -> "Hello Stranger!");
 			get("/:name", (req, res) -> "Hello "+req.params("name"));
-		});
-		
-		// for debugging perposes
-		get("session_count", (req,res) -> {
-			Session ses = req.session();
-			Integer s = ses.attribute("session_count");
-			s = (s == null ? 0 : s)+1;
-			ses.attribute("session_count", s);
-			return req.contextPath()+"\n"+ s;
 		});
 		
 		awaitInitialization();
