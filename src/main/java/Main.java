@@ -9,6 +9,7 @@ import static spark.Spark.stop;
 
 import java.util.Scanner;
 
+import spark.Session;
 import spark.embeddedserver.EmbeddedServers;
 import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 
@@ -29,6 +30,13 @@ public class Main {
 		path("hello", () -> {
 			get("", (req, res) -> "Hello Stranger!");
 			get("/:name", (req, res) -> "Hello "+req.params("name"));
+		});
+		get("session_count", (req,res) -> {
+			Session ses = req.session();
+			Integer s = ses.attribute("session_count");
+			s = (s == null ? 0 : s)+1;
+			ses.attribute("session_count", s);
+			return req.contextPath()+"\n"+ s;
 		});
 		
 		awaitInitialization();

@@ -8,9 +8,11 @@ import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -21,11 +23,12 @@ import spark.embeddedserver.jetty.JettyServerFactory;
 public class MyServerFactory implements JettyServerFactory {
 	public static class Svr extends Server {
 		private final ConstraintSecurityHandler security = new ConstraintSecurityHandler();
-		private SessionHandler sessionHandler;
+		private SessionHandler _sessionHandler;
+		
 		private final LoginService loginService = new HashLoginService("MyRealm", "realm.properties");
 		{
 			Constraint constraint = new Constraint();
-			constraint.setName(Constraint.__FORM_AUTH);
+			constraint.setName(Constraint.__BASIC_AUTH);
 			constraint.setAuthenticate(true);
 			constraint.setRoles(new String[]{"user", "admin"});
 
@@ -35,10 +38,12 @@ public class MyServerFactory implements JettyServerFactory {
 			mapping.setConstraint(constraint);
 
 			security.setConstraintMappings(Collections.singletonList(mapping));
-			security.setAuthenticator(new BasicAuthenticator());
+			
+			Authenticators.digest(constraint, security);
+			// Authenticators.form(constraint, security, () -> _sessionHandler);
+			
 			security.setLoginService(loginService);
 			security.setRealmName("myrealm");
-
 			addBean(loginService);
 		}
 
@@ -56,11 +61,13 @@ public class MyServerFactory implements JettyServerFactory {
 		}		
 		@Override
 		public void setHandler(Handler handler) {
-			sessionHandler = (JettyHandler) handler;
+			_sessionHandler = (JettyHandler) handler;
 			security.setHandler(handler);
 			security.setServer(getServer());
 			
-			sessionHandler.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+			System.out.println(_sessionHandler.getSessionIdManager());
+			
+			_sessionHandler.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
 			super.setHandler(security);
 		}
 	}
