@@ -9,6 +9,8 @@ import static spark.Spark.stop;
 
 import java.util.Scanner;
 
+import sam.logging.filter.ANSI;
+import sam.spark.authentication.MyServerFactory;
 import spark.Session;
 import spark.embeddedserver.EmbeddedServers;
 import spark.embeddedserver.jetty.EmbeddedJettyFactory;
@@ -16,7 +18,7 @@ import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		EmbeddedServers.add(EmbeddedServers.Identifiers.JETTY, new EmbeddedJettyFactory(new MyServerFactory()));
+		EmbeddedServers.add(EmbeddedServers.Identifiers.JETTY, new MyServerFactory());
 		staticFiles.location("public");
 		port(8080);
 		
@@ -31,6 +33,8 @@ public class Main {
 			get("", (req, res) -> "Hello Stranger!");
 			get("/:name", (req, res) -> "Hello "+req.params("name"));
 		});
+		
+		// for debugging perposes
 		get("session_count", (req,res) -> {
 			Session ses = req.session();
 			Integer s = ses.attribute("session_count");

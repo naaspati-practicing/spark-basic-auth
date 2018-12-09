@@ -1,7 +1,4 @@
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
+package sam.spark.authentication;
 import java.util.function.Supplier;
 
 import javax.servlet.ServletRequest;
@@ -18,20 +15,14 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.util.security.Constraint;
 
 import sam.logging.filter.ANSI;
-import spark.embeddedserver.jetty.JettyHandler;
+import spark.RequestResponseFactory;
+import spark.http.matching.MatcherFilter;
 
-public class Authenticators {
+class Authenticators {
 
 	public static void basic(Constraint constraint, ConstraintSecurityHandler security) {
 		constraint.setName(Constraint.__BASIC_AUTH);
-		security.setAuthenticator(new BasicAuthenticator() {
-			@Override
-			public Authentication validateRequest(ServletRequest req, ServletResponse res, boolean mandatory) throws ServerAuthException {
-				Authentication a = super.validateRequest(req, res, mandatory);
-				System.out.println(ANSI.red(a));
-				return a;
-			}
-		});
+		security.setAuthenticator(new BasicAuthenticator());
 	}
 	public static void digest(Constraint constraint, ConstraintSecurityHandler security) {
 		constraint.setName(Constraint.__DIGEST_AUTH);
@@ -50,6 +41,8 @@ public class Authenticators {
 			public Authentication validateRequest(ServletRequest req, ServletResponse res, boolean mandatory)
 					throws ServerAuthException {
 				Request r = (Request) req;
+				MatcherFilter m;
+				System.out.println(ANSI.red(RequestResponseFactory.create(r).session(true)));
 				Authentication a = super.validateRequest(r, res, mandatory);
 				return a;
 			} 
